@@ -1,27 +1,33 @@
-[tool.poetry]
+[project]
 name = "python-chargepoint"
 version = "1.10.0"
 description = "A simple, Pythonic wrapper for the ChargePoint API."
-authors = ["Marc Billow <mbillow@users.noreply.github.compoetry>"]
-license = "MIT"
-packages = [
-    { include = "python_chargepoint" },
-]
+authors = [{ name = "Marc Billow", email = "mbillow@users.noreply.github.compoetry" }]
+requires-python = "~=3.9"
 readme = "README.md"
+license = "MIT"
+dependencies = [
+    "cloudscraper>=1.2.71",
+    "requests>=2.32.3,<3",
+]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-requests = "^2.32.3"
+[dependency-groups]
+dev = [
+    "tox>=3.24.5,<4",
+    "black>=25.1.0,<26",
+    "pytest>=6.2.5,<7",
+    "responses>=0.18.0,<0.19",
+    "flake8>=7.2.0,<8",
+    "pytest-mock>=3.7.0,<4",
+    "pytest-cov>=3.0.0,<4",
+]
 
-[tool.poetry.group.dev.dependencies]
-tox = "^3.24.5"
-black = "^25.1.0"
-pytest = "^6.2.5"
-responses = "^0.18.0"
-flake8 = "^7.2.0"
-pytest-mock = "^3.7.0"
-pytest-cov = "^3.0.0"
+[tool.hatch.build.targets.sdist]
+include = ["python_chargepoint"]
+
+[tool.hatch.build.targets.wheel]
+include = ["python_chargepoint"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

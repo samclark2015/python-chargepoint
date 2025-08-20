@@ -1,10 +1,22 @@
-from uuid import uuid4
-from typing import List, Optional
 from functools import wraps
 from time import sleep
+from typing import List, Optional
+from uuid import uuid4
 
-from requests import Session, codes, post
+import cloudscraper as cs
 
+# from requests import Session, codes, post
+from requests import codes
+
+from .constants import _LOGGER, DISCOVERY_API
+from .exceptions import (
+    ChargePointBaseException,
+    ChargePointCommunicationException,
+    ChargePointInvalidSession,
+    ChargePointLoginError,
+)
+from .global_config import ChargePointGlobalConfiguration
+from .session import ChargingSession
 from .types import (
     ChargePointAccount,
     ElectricVehicle,
@@ -12,15 +24,6 @@ from .types import (
     HomeChargerTechnicalInfo,
     UserChargingStatus,
 )
-from .exceptions import (
-    ChargePointLoginError,
-    ChargePointCommunicationException,
-    ChargePointBaseException,
-    ChargePointInvalidSession,
-)
-from .global_config import ChargePointGlobalConfiguration
-from .session import ChargingSession
-from .constants import _LOGGER, DISCOVERY_API
 
 
 def _dict_for_query(device_data: dict) -> dict:
@@ -60,7 +63,8 @@ class ChargePoint:
         session_token: str = "",
         app_version: str = "5.97.0",
     ):
-        self._session = Session()
+        # self._session = Session()
+        self._session = cs.create_scraper()
         self._app_version = app_version
         self._device_data = {
             "appId": "com.coulomb.ChargePoint",
@@ -98,7 +102,7 @@ class ChargePoint:
         return self._user_id
 
     @property
-    def session(self) -> Session:
+    def session(self) -> cs.CloudScraper:
         return self._session
 
     @property
@@ -131,7 +135,7 @@ class ChargePoint:
             "password": password,
         }
         _LOGGER.debug("Attempting client login with user: %s", username)
-        login = post(login_url, json=request, headers=headers)
+        login = self._session.post(login_url, json=request, headers=headers)
         _LOGGER.debug(login.cookies.get_dict())
         _LOGGER.debug(login.headers)
 
